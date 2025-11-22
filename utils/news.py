@@ -1,5 +1,5 @@
 import feedparser
-
+from newspaper import Article
 
 
 
@@ -45,6 +45,23 @@ rss_top = ["https://timesofindia.indiatimes.com/rssfeedstopstories.cms",
            "https://indianexpress.com/section/trending/feed/", 
             "https://feeds.feedburner.com/ndtvnews-top-stories" ]
 
+
+def extract_article(url: str) -> dict:
+    """
+    Downloads and parses the article from the given URL.
+    Returns dict with title, text, authors, publish_date.
+    """
+    article = Article(url)
+    article.download()
+    article.parse()
+    # optional: article.nlp()  # gives keywords, summary, etc.
+
+    return {
+        "title": article.title or "",
+        "text": article.text or "",
+        "authors": getattr(article, "authors", []),
+        "publish_date": article.publish_date.isoformat() if article.publish_date else None,
+    }
 
 
 def fetch_rss(url : str):
